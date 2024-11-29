@@ -1,0 +1,36 @@
+translator,sentence,sentence_type,model_calls,back_model_calls
+pipeline,They are climbing.,subject-verb,2,2
+pipeline,I read.,subject-verb,2,2
+pipeline,He works.,subject-verb,2,2
+pipeline,The bird chased a worm.,subject-verb-object,2,2
+pipeline,The bear caught a fish.,subject-verb-object,2,2
+pipeline,Tom caught a fish.,subject-verb-object,2,2
+pipeline,We are playing and laughing.,two-verb,3,4
+pipeline,I will cook and eat.,two-verb,3,4
+pipeline,I read and write.,two-verb,3,4
+pipeline,The bird chirped and the squirrel jumped.,two-clause,3,4
+pipeline,Mike cooked and his sister danced.,two-clause,3,4
+pipeline,The dog ate soup and the cat ran.,two-clause,3,4
+pipeline,The bird and the squirrel played.,complex,3,4
+pipeline,The bear and the fox foraged for food.,complex,3,4
+pipeline,The dog and the cat were eating soup.,complex,3,4
+pipeline,The one who will run kicks the ball.,nominalization,2,2
+pipeline,The swimmer has reached the shore.,nominalization,2,2
+pipeline,The driver is opening the door.,nominalization,2,2
+agentic,They are climbing.,subject-verb,7,1
+agentic,I read.,subject-verb,7,1
+agentic,He works.,subject-verb,7,1
+agentic,The bird chased a worm.,subject-verb-object,9,1
+agentic,The bear caught a fish.,subject-verb-object,9,1
+agentic,Tom caught a fish.,subject-verb-object,9,1
+agentic,We are playing and laughing.,two-verb,7,1
+agentic,I will cook and eat.,two-verb,14,2
+agentic,I read and write.,two-verb,14,1
+agentic,The bird chirped and the squirrel jumped.,two-clause,21,2
+agentic,Mike cooked and his sister danced.,two-clause,10,1
+agentic,The dog ate soup and the cat ran.,two-clause,23,2
+agentic,The bird and the squirrel played.,complex,9,1
+agentic,The bear and the fox foraged for food.,complex,9,1
+agentic,The dog and the cat were eating soup.,complex,9,1
+agentic,The one who will run kicks the ball.,nominalization,16,1
+agentic,The swimmer has reached the shore.,nominalization,17,1

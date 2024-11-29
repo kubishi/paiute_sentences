@@ -1,12 +1,9 @@
 import logging
 import pathlib
-from typing import Dict
-from flask import Flask, render_template, request, jsonify, redirect, send_from_directory, url_for
+from flask import render_template, request, redirect, send_from_directory, url_for
 from flask_talisman import Talisman
 import os
 from helpers import MyAPIError
-from translate_eng2ovp import translate_ovp_to_english, translate_english_to_ovp
-
 
 from helpers import MyAPIError
 from app_base import app, bp
@@ -44,8 +41,6 @@ def handle_app_error(e: AppError):
 def handle_exception(e: Exception):
     logging.exception(e)
     return render_template('error.html', error_code=500, error_message='Internal server error'), 500
-
-from sentence_builder import get_all_choices, format_sentence, get_random_sentence, get_random_sentence_big
 
 # favicon route - in static/img/favicon.ico
 @bp.route('/favicon.ico')

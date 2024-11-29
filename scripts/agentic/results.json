@@ -1,0 +1,86 @@
+[
+    {
+        "model": "gpt-4o-mini",
+        "sentence": "simple",
+        "translation": {
+            "source": "The dog is running.",
+            "target": "isha'pugu-ii poyoha-ti.",
+            "back_translation": "This dog is running.",
+            "translation_prompt_tokens": 128749,
+            "translation_completion_tokens": 18,
+            "back_translation_prompt_tokens": 584,
+            "back_translation_completion_tokens": 6
+        },
+        "cost": 0.019414349999999997
+    },
+    {
+        "model": "gpt-4o-mini",
+        "sentence": "complex",
+        "translation": {
+            "source": "The boy and the girl are eating a quesadilla.",
+            "target": "[tüka]-neika uhuw̃a a-düka-ti.",
+            "back_translation": "They are eating this [túka].",
+            "translation_prompt_tokens": 209057,
+            "translation_completion_tokens": 33,
+            "back_translation_prompt_tokens": 603,
+            "back_translation_completion_tokens": 10
+        },
+        "cost": 0.0314748
+    },
+    {
+        "model": "gpt-4o-mini",
+        "sentence": "nominalization",
+        "translation": {
+            "source": "The cook saw the ones who walked.",
+            "target": "sawa-dü-uu puni-ku.",
+            "back_translation": "That one who cooks saw.",
+            "translation_prompt_tokens": 159877,
+            "translation_completion_tokens": 24,
+            "back_translation_prompt_tokens": 594,
+            "back_translation_completion_tokens": 8
+        },
+        "cost": 0.02408985
+    },
+    {
+        "model": "gpt-4o",
+        "sentence": "simple",
+        "translation": {
+            "source": "The dog is running.",
+            "target": "isha'pugu-ii poyoha-ti.",
+            "back_translation": "This dog is running.",
+            "translation_prompt_tokens": 128749,
+            "translation_completion_tokens": 18,
+            "back_translation_prompt_tokens": 584,
+            "back_translation_completion_tokens": 6
+        },
+        "cost": 0.32357250000000004
+    },
+    {
+        "model": "gpt-4o",
+        "sentence": "complex",
+        "translation": {
+            "source": "The boy and the girl are eating a quesadilla.",
+            "target": "[boy and girl]-ii [quesadilla]-neika a-düka-ti.",
+            "back_translation": "The boy and girl are eating this quesadilla.",
+            "translation_prompt_tokens": 240060,
+            "translation_completion_tokens": 37,
+            "back_translation_prompt_tokens": 603,
+            "back_translation_completion_tokens": 12
+        },
+        "cost": 0.6021475
+    },
+    {
+        "model": "gpt-4o",
+        "sentence": "nominalization",
+        "translation": {
+            "source": "The cook saw the ones who walked.",
+            "target": "sawa-dü-ii hukaw̃ia-doka ui-buni-ku.",
+            "back_translation": "This one who cooks saw those ones who walk.",
+            "translation_prompt_tokens": 304910,
+            "translation_completion_tokens": 48,
+            "back_translation_prompt_tokens": 631,
+            "back_translation_completion_tokens": 12
+        },
+        "cost": 0.7644525000000001
+    }
+]

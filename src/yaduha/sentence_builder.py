@@ -1,13 +1,7 @@
-
-
-from itertools import starmap
-import json
+from copy import deepcopy
 import logging
-import pathlib
 import random
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
-
-import pandas as pd
+from typing import Any, Dict, List, Optional
 
 
 NOUNS = {
@@ -65,12 +59,18 @@ class Subject:
         "üü": "you",
         "üügwa": "you (plural)",
     }
-    def __init__(self, noun: str, subject_suffix: Optional[str]):
+    def __init__(self, noun: str, subject_noun_nominalizer: Optional[str], subject_suffix: Optional[str]):
         self.noun = noun
+        self.subject_noun_nominalizer = subject_noun_nominalizer
         self.subject_suffix = subject_suffix
 
         if self.noun in Subject.PRONOUNS and self.subject_suffix is not None:
             raise ValueError("Subject suffix is not allowed with pronouns")
+        
+        if self.noun in NOUNS and self.subject_noun_nominalizer is not None:
+            raise ValueError("Subject noun nominalizer is not allowed with nouns")
+        elif self.noun in {*Verb.TRANSITIVE_VERBS.keys(), *Verb.INTRANSITIVE_VERBS.keys()} and self.subject_noun_nominalizer is None:
+            raise ValueError("Subject noun nominalizer is required with verbs")
         
         if self.noun not in Subject.PRONOUNS:
             if self.subject_suffix is None:
@@ -82,6 +82,8 @@ class Subject:
     def __str__(self) -> str:
         if self.subject_suffix is None:
             return self.noun
+        elif self.subject_noun_nominalizer is not None:
+            return f"{self.noun}-{self.subject_noun_nominalizer}-{self.subject_suffix}"
         else:
             return f"{self.noun}-{self.subject_suffix}"
         
@@ -98,17 +100,34 @@ class Subject:
                 'text': self.noun,
                 'definition': Subject.PRONOUNS[self.noun]
             })
-        else:
+        elif self.subject_noun_nominalizer is not None:
             data['parts'].append({
                 'type': 'noun',
                 'text': self.noun,
-                'definition': NOUNS[self.noun]
+                'definition': {**Verb.TRANSITIVE_VERBS, **Verb.INTRANSITIVE_VERBS}.get(self.noun, f"[{self.noun}]")
+            })
+            data['parts'].append({
+                'type': 'nominalizer',
+                'text': self.subject_noun_nominalizer,
+                'definition': Verb.NOMINALIZER_TENSES[self.subject_noun_nominalizer]
             })
             data['parts'].append({
                 'type': 'subject_suffix',
                 'text': self.subject_suffix,
                 'definition': self.SUFFIXES[self.subject_suffix]
             })
+        else:
+            data['parts'].append({
+                'type': 'noun',
+                'text': self.noun,
+                'definition': NOUNS.get(self.noun, f"[{self.noun}]")
+            })
+            data['parts'].append({
+                'type': 'subject_suffix',
+                'text': self.subject_suffix,
+                'definition': self.SUFFIXES[self.subject_suffix]
+            })
+            
         return data
 
 
@@ -137,7 +156,11 @@ class Verb:
         'gaa-wei': 'future (going to)',
         'pü': 'have x-ed, am x-ed',
     }
-    TRANSIITIVE_VERBS = {
+    NOMINALIZER_TENSES = {
+        'dü': 'present',
+        'weidü': 'future (will)',
+    }
+    TRANSITIVE_VERBS = {
         'tüka': 'eat',
         'puni': 'see',
         'hibi': 'drink',
@@ -188,16 +211,9 @@ class Verb:
         if tense_suffix not in self.TENSES:
             raise ValueError(f"Tense must be one of {self.TENSES} (not {tense_suffix})")
         
-        if self.verb_stem in Verb.TRANSIITIVE_VERBS:
-            # if self.object_pronoun_prefix is None:
-            #     raise ValueError("Object pronoun prefix is required for transitive verbs")
-            pass
-        elif self.verb_stem in Verb.INTRANSITIVE_VERBS:
+        if self.is_intransitive:
             if self.object_pronoun_prefix is not None:
                 raise ValueError("Intransitive verbs cannot have object pronouns")
-        else:
-            # raise ValueError(f"Verb stem must be one of {Verb.TRANSIITIVE_VERBS} or {Verb.INTRANSITIVE_VERBS} (not {verb_stem})")
-            logging.warning(f"Verb stem must be one of {Verb.TRANSIITIVE_VERBS} or {Verb.INTRANSITIVE_VERBS} (not {verb_stem})")
         
     def __str__(self) -> str:
         if self.object_pronoun_prefix is None:
@@ -206,9 +222,21 @@ class Verb:
             verb_stem = to_lenis(self.verb_stem)
             return f"{self.object_pronoun_prefix}-{verb_stem}-{self.tense_suffix}"
         
+    @classmethod
+    def _is_transitive(cls, verb_stem: str) -> bool:
+        return not cls._is_intransitive(verb_stem) # by default, all verbs are considered transitive
+    
+    @classmethod
+    def _is_intransitive(cls, verb_stem: str) -> bool:
+        return verb_stem in cls.INTRANSITIVE_VERBS and verb_stem not in cls.TRANSITIVE_VERBS
+
     @property
     def is_transitive(self) -> bool:
-        return self.verb_stem in Verb.TRANSIITIVE_VERBS
+        return Verb._is_transitive(self.verb_stem)
+    
+    @property
+    def is_intransitive(self) -> bool:
+        return Verb._is_intransitive(self.verb_stem)
     
     @property
     def details(self) -> Dict:
@@ -226,7 +254,11 @@ class Verb:
         data['parts'].append({
             'type': 'verb_stem',
             'text': self.verb_stem,
-            'definition': Verb.TRANSIITIVE_VERBS[self.verb_stem] if self.is_transitive else Verb.INTRANSITIVE_VERBS[self.verb_stem]
+            'definition': (
+                Verb.TRANSITIVE_VERBS.get(self.verb_stem, f'[{self.verb_stem}]')
+                if self.is_transitive else
+                Verb.INTRANSITIVE_VERBS.get(self.verb_stem, f'[{self.verb_stem}]')
+            )
         })
         data['parts'].append({
             'type': 'tense',
@@ -255,8 +287,9 @@ class Object:
         'ü': 'you (singular)',
         'üi': 'you (plural), you all',
     }
-    def __init__(self, noun: str, object_suffix: Optional[str]):
+    def __init__(self, noun: str, object_noun_nominalizer: Optional[str], object_suffix: Optional[str]):
         self.noun = noun
+        self.object_noun_nominalizer = object_noun_nominalizer
         self.object_suffix = object_suffix
 
         if self.object_suffix is None:
@@ -264,13 +297,24 @@ class Object:
         elif self.object_suffix not in self.SUFFIXES:
             raise ValueError(f"Object suffix must be one of {self.SUFFIXES} (not {object_suffix})")
         
+        if self.noun in NOUNS and self.object_noun_nominalizer is not None:
+            raise ValueError("Object noun nominalizer is not allowed with nouns")
+        elif self.noun in {*Verb.TRANSITIVE_VERBS.keys(), *Verb.INTRANSITIVE_VERBS.keys()} and self.object_noun_nominalizer is None:
+            raise ValueError("Object noun nominalizer is required with verbs")
+        
     def __str__(self) -> str:
         object_suffix = self.object_suffix
-        if "'" not in self.noun[-2:]: # noun does not end in glottal stop
+        if self.object_noun_nominalizer is None:
+            if "'" not in self.noun[-2:]: # noun does not end in glottal stop
+                if object_suffix == 'eika':
+                    object_suffix = 'neika'
+                elif object_suffix == 'oka':
+                    object_suffix = 'noka'
+        else:
             if object_suffix == 'eika':
-                object_suffix = 'neika'
+                object_suffix = f'{self.object_noun_nominalizer[:-1]}eika'
             elif object_suffix == 'oka':
-                object_suffix = 'noka'
+                object_suffix = f'{self.object_noun_nominalizer[:-1]}oka'
         return f"{self.noun}-{object_suffix}"
     
     @classmethod
@@ -330,11 +374,23 @@ class Object:
             'text': str(self),
             'parts': []
         }
-        data['parts'].append({
-            'type': 'noun',
-            'text': self.noun,
-            'definition': NOUNS[self.noun]
-        })
+        if self.object_noun_nominalizer is None:
+            data['parts'].append({
+                'type': 'noun',
+                'text': self.noun,
+                'definition': NOUNS.get(self.noun, f"[{self.noun}]")
+            })
+        else:
+            data['parts'].append({
+                'type': 'noun',
+                'text': self.noun,
+                'definition': {**Verb.TRANSITIVE_VERBS, **Verb.INTRANSITIVE_VERBS}.get(self.noun, f"[{self.noun}]")
+            })
+            data['parts'].append({
+                'type': 'nominalizer',
+                'text': self.object_noun_nominalizer,
+                'definition': Verb.NOMINALIZER_TENSES[self.object_noun_nominalizer]
+            })
         data['parts'].append({
             'type': 'object_suffix',
             'text': self.object_suffix,
@@ -342,22 +398,31 @@ class Object:
         })
         return data
 
-def get_all_choices(subject_noun: Optional[str],
-                    subject_suffix: Optional[str],
-                    verb: Optional[str],
-                    verb_tense: Optional[str],
-                    object_pronoun: Optional[str],
-                    object_noun: Optional[str],
-                    object_suffix: Optional[str]) -> Dict[str, Any]:
+def get_all_choices(subject_noun: Optional[str] = None,
+                    subject_noun_nominalizer: Optional[str] = None,
+                    subject_suffix: Optional[str] = None,
+                    verb: Optional[str] = None,
+                    verb_tense: Optional[str] = None,
+                    object_pronoun: Optional[str] = None,
+                    object_noun: Optional[str] = None,
+                    object_noun_nominalizer: Optional[str] = None,
+                    object_suffix: Optional[str] = None) -> Dict[str, Any]:
+    is_verb_wild = verb is not None and verb.startswith('[') and verb.endswith(']')
+    is_subject_noun_wild = subject_noun is not None and subject_noun.startswith('[') and subject_noun.endswith(']')
+    is_object_noun_wild = object_noun is not None and object_noun.startswith('[') and object_noun.endswith(']')
+
     choices = {}
     # Validate inputs
-    if subject_noun not in {*Subject.PRONOUNS.keys(), *NOUNS.keys()}:
+    if subject_noun not in {*Subject.PRONOUNS.keys(), *NOUNS.keys(), *Verb.TRANSITIVE_VERBS.keys(), *Verb.INTRANSITIVE_VERBS.keys()} and not is_subject_noun_wild:
         subject_noun = None
+
+    if subject_noun_nominalizer not in Verb.NOMINALIZER_TENSES.keys():
+        subject_noun_nominalizer = None
 
     if subject_suffix not in Subject.SUFFIXES.keys():
         subject_suffix = None
 
-    if verb not in [*Verb.TRANSIITIVE_VERBS.keys(), *Verb.INTRANSITIVE_VERBS.keys()]:
+    if verb not in [*Verb.TRANSITIVE_VERBS.keys(), *Verb.INTRANSITIVE_VERBS.keys()] and not is_verb_wild:
         verb = None
 
     if verb_tense not in Verb.TENSES.keys():
@@ -366,11 +431,14 @@ def get_all_choices(subject_noun: Optional[str],
     if object_pronoun not in Object.PRONOUNS.keys():
         object_pronoun = None
 
-    if object_noun not in NOUNS.keys():
+    if object_noun not in [*NOUNS.keys(), *Verb.TRANSITIVE_VERBS.keys(), *Verb.INTRANSITIVE_VERBS.keys()] and not is_object_noun_wild:
         object_noun = None
 
     if object_suffix not in Object.SUFFIXES.keys():
         object_suffix = None
+
+    if object_noun_nominalizer not in Verb.NOMINALIZER_TENSES.keys():
+        object_noun_nominalizer = None
 
     # Check object_pronoun and object_suffix match
     # if mismatch, set to None (will be corrected below)
@@ -378,48 +446,60 @@ def get_all_choices(subject_noun: Optional[str],
         if object_pronoun not in Object.get_matching_third_person_pronouns(object_suffix):
             object_suffix = None
 
-    def to_choice(word: str, trans: str) -> Tuple[str, str]:
-        return word, f"{word}: {trans}"
-
     # Subject
     choices['subject_noun'] = {
-        # 'choices': [*Subject.PRONOUNS.keys(), *NOUNS.keys()],
-        'choices': [
-            *starmap(to_choice, Subject.PRONOUNS.items()),
-            *starmap(to_choice, NOUNS.items())
-        ],
+        'choices': {
+            **Subject.PRONOUNS,
+            **NOUNS,
+            **Verb.TRANSITIVE_VERBS,
+            **Verb.INTRANSITIVE_VERBS
+        },
         'value': subject_noun,
         'requirement': "required"
     }
     if subject_noun is None or subject_noun in Subject.PRONOUNS:
         choices['subject_suffix'] = {
-            'choices': [],
+            'choices': {},
             'value': None,
             'requirement': "disabled"
         }
         subject_suffix = None
     else:
         choices['subject_suffix'] = {
-            'choices': [*starmap(to_choice, Subject.SUFFIXES.items())],
+            'choices': Subject.SUFFIXES,
             'value': subject_suffix,
             'requirement': "required"
         }
 
+    if subject_noun in [*Verb.TRANSITIVE_VERBS.keys(), *Verb.INTRANSITIVE_VERBS.keys()]:
+        choices['subject_noun_nominalizer'] = {
+            'choices': Verb.NOMINALIZER_TENSES,
+            'value': subject_noun_nominalizer,
+            'requirement': "required"
+        }
+    else:
+        choices['subject_noun_nominalizer'] = {
+            'choices': {},
+            'value': None,
+            'requirement': "disabled"
+        }
+        subject_noun_nominalizer = None
+
     # Verb
     if object_noun is not None: # verb must be transitive
-        if verb not in Verb.TRANSIITIVE_VERBS:
+        if not Verb._is_transitive(verb):
             verb = None
         choices['verb'] = {
-            'choices': [*starmap(to_choice, Verb.TRANSIITIVE_VERBS.items())],
-            'value': verb,
+            'choices': Verb.TRANSITIVE_VERBS,
+            'value': verb if Verb._is_transitive(verb) else None,
             'requirement': "required"
         }
     else:
         choices['verb'] = {
-            'choices': [
-                *starmap(to_choice, Verb.TRANSIITIVE_VERBS.items()),
-                *starmap(to_choice, Verb.INTRANSITIVE_VERBS.items())
-            ],
+            'choices': {
+                **Verb.TRANSITIVE_VERBS,
+                **Verb.INTRANSITIVE_VERBS
+            },
             'value': verb,
             'requirement': "required"
         }
@@ -427,64 +507,80 @@ def get_all_choices(subject_noun: Optional[str],
     # Verb tense
     if verb is None:
         choices['verb_tense'] = {
-            'choices': [],
+            'choices': {},
             'value': None,
             'requirement': "disabled"
         }
         verb_tense = None
     else:
         choices['verb_tense'] = {
-            # 'choices': list(Verb.TENSES.keys()),
-            'choices': [*starmap(to_choice, Verb.TENSES.items())],
+            'choices': Verb.TENSES,
             'value': verb_tense,
             'requirement': "required"
         }
 
     # Object pronoun
-    if verb is None or verb in Verb.INTRANSITIVE_VERBS: 
+    if verb is None or Verb._is_intransitive(verb): 
         choices['object_pronoun'] = {
-            'choices': [],
+            'choices': {},
             'value': None,
             'requirement': "disabled"
         }
         object_pronoun = None
     elif object_noun is not None: # object pronoun must match object suffix
         choices['object_pronoun'] = {
-            'choices': [to_choice(pronoun, Object.PRONOUNS[pronoun]) for pronoun in Object.get_matching_third_person_pronouns(object_suffix)],
+            'choices': {
+                p: Object.PRONOUNS[p] for p in Object.get_matching_third_person_pronouns(object_suffix)
+            },
             'value': object_pronoun,
             'requirement': "required"
         }
     else:
         choices['object_pronoun'] = {
-            # 'choices': list(Object.PRONOUNS.keys()),
-            'choices': [*starmap(to_choice, Object.PRONOUNS.items())],
+            'choices': Object.PRONOUNS,
             'value': object_pronoun,
             'requirement': "optional"
         }
 
 
     # Object noun
-    # if verb is intransitive, object noun must be None
-    # if verb in Verb.INTRANSITIVE_VERBS or object_pronoun not in Object.get_matching_third_person_pronouns(None):
-    if verb in Verb.INTRANSITIVE_VERBS or object_pronoun not in [None, *Object.get_matching_third_person_pronouns(None)]:
+    if (verb is not None and Verb._is_intransitive(verb)) or object_pronoun not in [None, *Object.get_matching_third_person_pronouns(None)]:
         choices['object_noun'] = {
-            'choices': [],
+            'choices': {},
             'value': None,
             'requirement': "disabled"
         }
         object_noun = None
     else: # verb is not selected or is transitive
         choices['object_noun'] = {
-            # 'choices': list(NOUNS.keys()),
-            'choices': [*starmap(to_choice, NOUNS.items())],
+            'choices': {
+                **NOUNS,
+                **Verb.TRANSITIVE_VERBS,
+                **Verb.INTRANSITIVE_VERBS
+            },
             'value': object_noun,
+            'requirement': "optional"
+        }
+    
+    # if object_noun is None and it's either a transitive or intransitive verb, require an object_noun_nominalizer
+    if object_noun in [*Verb.TRANSITIVE_VERBS.keys(), *Verb.INTRANSITIVE_VERBS.keys()]:
+        choices['object_noun_nominalizer'] = {
+            'choices': Verb.NOMINALIZER_TENSES,
+            'value': object_noun_nominalizer,
             'requirement': "required"
         }
+    else:
+        choices['object_noun_nominalizer'] = {
+            'choices': {},
+            'value': None,
+            'requirement': "disabled"
+        }
+        object_noun_nominalizer = None
 
     # Object suffix
     if object_noun is None:
         choices['object_suffix'] = {
-            'choices': [],
+            'choices': {},
             'value': None,
             'requirement': "disabled"
         }
@@ -492,13 +588,13 @@ def get_all_choices(subject_noun: Optional[str],
     elif object_pronoun is not None:
         matching_suffix = Object.get_matching_suffix(object_pronoun)
         choices['object_suffix'] = {
-            'choices': [] if matching_suffix is None else [to_choice(matching_suffix, Object.SUFFIXES[matching_suffix])],
+            'choices': {} if matching_suffix is None else {matching_suffix: Object.SUFFIXES[matching_suffix]},
             'value': None if object_suffix != Object.get_matching_suffix(object_pronoun) else object_suffix,
             'requirement': "required"
         }
     else:
         choices['object_suffix'] = {
-            'choices': [*starmap(to_choice, Object.SUFFIXES.items())],
+            'choices': Object.SUFFIXES,
             'value': object_suffix,
             'requirement': "required"
         }
@@ -506,13 +602,15 @@ def get_all_choices(subject_noun: Optional[str],
     return choices
 
 def format_sentence(subject_noun: Optional[str],
+                    subject_noun_nominalizer: Optional[str],
                     subject_suffix: Optional[str],
                     verb: Optional[str],
                     verb_tense: Optional[str],
                     object_pronoun: Optional[str],
                     object_noun: Optional[str],
+                    object_noun_nominalizer: Optional[str],
                     object_suffix: Optional[str]) -> List[Dict]:
-    subject = Subject(subject_noun, subject_suffix)
+    subject = Subject(subject_noun, subject_noun_nominalizer, subject_suffix)
     _verb = Verb(verb, verb_tense, object_pronoun)
 
     # check object_pronoun and object_suffix match
@@ -522,7 +620,7 @@ def format_sentence(subject_noun: Optional[str],
 
     object = None
     try:
-        object = Object(object_noun, object_suffix)
+        object = Object(object_noun, object_noun_nominalizer, object_suffix)
     except ValueError as e: # could not create object
         if object_noun is not None:
             raise e
@@ -539,19 +637,17 @@ def format_sentence(subject_noun: Optional[str],
             return [subject.details, object.details, _verb.details]
         else:
              return [subject.details, _verb.details]
-        
 
 def get_random_sentence(choices: Dict[str, Dict[str, Any]] = {}):
-    if not choices:
-        choices = get_all_choices(None, None, None, None, None, None, None)
-    all_keys = list(choices.keys())
+    choices = get_all_choices(**{k: v['value'] for k, v in choices.items()})
+    all_pos = list(choices.keys())
     i = 0
     while True:
-        random.shuffle(all_keys)
-        for key in all_keys:
-            if not choices[key]['choices'] or choices[key]['value']:
+        random.shuffle(all_pos)
+        for pos in all_pos:
+            if not choices[pos]['choices'] or choices[pos]['value'] is not None:
                 continue
-            choices[key]['value'], _ = random.choice(choices[key]['choices'])
+            choices[pos]['value'], _ = random.choice(list(choices[pos]['choices'].items()))
             choices = get_all_choices(**{k: v['value'] for k, v in choices.items()})
             i = 0
 
@@ -564,16 +660,41 @@ def get_random_sentence(choices: Dict[str, Dict[str, Any]] = {}):
                 raise e
             continue
 
+def get_random_simple_sentence(choices: Dict[str, Dict[str, Any]] = {}):
+    choices = deepcopy(choices)
+    choices = get_all_choices(**{k: v['value'] for k, v in choices.items()})
+    word_choices = {pos: v.get('value') for pos, v in choices.items()}
+    choices['subject_noun']['value'] = word_choices.get('subject_noun') or random.choice(list(NOUNS.keys()))
+    choices['verb']['value'] = word_choices.get('verb') or random.choice([*Verb.TRANSITIVE_VERBS.keys(), *Verb.INTRANSITIVE_VERBS.keys()])
+    if Verb._is_transitive(choices['verb']['value']):
+        choices['object_noun']['value'] = word_choices.get('object_noun') or random.choice(list(NOUNS.keys()))
+    choices = get_all_choices(**{k: v['value'] for k, v in choices.items()})
+    return get_random_sentence(choices)
+
+
 def get_random_sentence_big():
-    subject_noun = random.choice(list(NOUNS.keys()))
+    subject_noun = random.choice([*Verb.TRANSITIVE_VERBS.keys(), *Verb.INTRANSITIVE_VERBS.keys()])
+    subject_noun_nominalizer = random.choice(list(Verb.NOMINALIZER_TENSES.keys()))
     subject_suffix = random.choice(list(Subject.SUFFIXES.keys()))
-    verb = random.choice(list(Verb.TRANSIITIVE_VERBS.keys()))
+    verb = random.choice(list(Verb.TRANSITIVE_VERBS.keys()))
     verb_tense = random.choice(list(Verb.TENSES.keys()))
     object_pronoun = random.choice(list(Object.get_matching_third_person_pronouns(None)))
-    object_noun = random.choice(list(NOUNS.keys()))
+    object_noun = random.choice([*Verb.TRANSITIVE_VERBS.keys(), *Verb.INTRANSITIVE_VERBS.keys()])
+    object_noun_nominalizer = random.choice(list(Verb.NOMINALIZER_TENSES.keys()))
     object_suffix = Object.get_matching_suffix(object_pronoun)
 
-    choices = get_all_choices(subject_noun, subject_suffix, verb, verb_tense, object_pronoun, object_noun, object_suffix)
+    choices = get_all_choices(
+        subject_noun=subject_noun,
+        subject_noun_nominalizer=subject_noun_nominalizer,
+        subject_suffix=subject_suffix,
+        verb=verb,
+        verb_tense=verb_tense,
+        object_pronoun=object_pronoun,
+        object_noun=object_noun,
+        object_noun_nominalizer=object_noun_nominalizer,
+        object_suffix=object_suffix
+    )
+
     return choices
 
 def sentence_to_str(sentence: List[Dict]):
@@ -585,12 +706,5 @@ def sentence_to_str(sentence: List[Dict]):
 def print_sentence(sentence: List[Dict]):
     print(sentence_to_str(sentence))
 
-def main():
-    for _ in range(100):
-        choices = get_random_sentence()
-        sentence = format_sentence(**{k: v['value'] for k, v in choices.items()})
-        print_sentence(sentence)
 
-if __name__ == "__main__":
-    main()
     

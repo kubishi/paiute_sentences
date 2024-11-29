@@ -1,0 +1,151 @@
+sentence,type
+They are climbing.,subject-verb
+I read.,subject-verb
+He works.,subject-verb
+I will cook.,subject-verb
+I am swimming.,subject-verb
+He visited.,subject-verb
+I ate.,subject-verb
+They were laughing.,subject-verb
+I was running.,subject-verb
+Birds were chirping.,subject-verb
+She sings.,subject-verb
+We are playing.,subject-verb
+She is cooking.,subject-verb
+They danced.,subject-verb
+They will travel.,subject-verb
+We traveled.,subject-verb
+We will celebrate.,subject-verb
+Dogs are chasing.,subject-verb
+She smiled.,subject-verb
+Birds will migrate.,subject-verb
+He was painting.,subject-verb
+She will study.,subject-verb
+Plants grow.,subject-verb
+Dogs bark.,subject-verb
+She was typing.,subject-verb
+The bird chased a worm.,subject-verb-object
+The bear caught a fish.,subject-verb-object
+Tom caught a fish.,subject-verb-object
+Rachel loves coffee.,subject-verb-object
+John read a book.,subject-verb-object
+The dog ate soup.,subject-verb-object
+The sun heats the earth.,subject-verb-object
+Batman caught a thief.,subject-verb-object
+Romeo wrote a letter.,subject-verb-object
+Jack found a pail.,subject-verb-object
+Susan sings songs.,subject-verb-object
+Mike watched a movie.,subject-verb-object
+The king wore a crown.,subject-verb-object
+The lion hunted a deer.,subject-verb-object
+The captain steered the ship.,subject-verb-object
+Harry received a letter.,subject-verb-object
+Linda bought a dress.,subject-verb-object
+The chef prepared a meal.,subject-verb-object
+My brother drives a car.,subject-verb-object
+Alice opened a door.,subject-verb-object
+Paul plays the guitar.,subject-verb-object
+The writer finished a story.,subject-verb-object
+The teacher gave a lecture.,subject-verb-object
+Mom made dinner.,subject-verb-object
+Anna baked a cake.,subject-verb-object
+We are playing and laughing.,two-verb
+I will cook and eat.,two-verb
+I read and write.,two-verb
+They were laughing and joking.,two-verb
+She sings and dances.,two-verb
+They danced and laughed.,two-verb
+He visited and enjoyed.,two-verb
+We will celebrate and dance.,two-verb
+Birds were chirping and flying.,two-verb
+They are climbing and exploring.,two-verb
+He works and studies.,two-verb
+She is cooking and tasting.,two-verb
+I am swimming and relaxing.,two-verb
+She was typing and sipping coffee.,two-verb
+I ate while watching TV.,two-verb
+They will travel and explore.,two-verb
+We traveled and discovered.,two-verb
+I was running and listening to music.,two-verb
+Birds will migrate and return.,two-verb
+He was painting and humming.,two-verb
+She will study and pass.,two-verb
+Dogs are chasing and barking.,two-verb
+Plants grow and bloom.,two-verb
+Dogs bark and wag their tails.,two-verb
+She smiled and waved.,two-verb
+The bird chirped and the squirrel jumped.,two-clause
+Mike cooked and his sister danced.,two-clause
+The dog ate soup and the cat ran.,two-clause
+Susan sang and I read.,two-clause
+Harry wrote and Ron read.,two-clause
+The king sat and the queen stood.,two-clause
+Tom slept and Jerry watched.,two-clause
+Rachel danced and Monica sang.,two-clause
+Jack climbed and Jill followed.,two-clause
+Alice laughed and Bob cried.,two-clause
+My brother drove and I waited.,two-clause
+Romeo called and Juliet answered.,two-clause
+The captain shouted and the crew responded.,two-clause
+Anna swam and Elsa skated.,two-clause
+The sun shone and the moon glowed.,two-clause
+Mom laughed and dad cried.,two-clause
+The lion hunted and the tiger rested.,two-clause
+The writer typed and the poet thought.,two-clause
+The teacher spoke and the student listened.,two-clause
+John traveled and Mary studied.,two-clause
+The bear roared and the fox hid.,two-clause
+The chef baked and his assistant cleaned.,two-clause
+Batman swung and Robin landed.,two-clause
+Paul jumped and Peter ducked.,two-clause
+Linda painted and her friend sketched.,two-clause
+The bird and the squirrel played.,complex
+The bear and the fox foraged for food.,complex
+The dog and the cat were eating soup.,complex
+Batman and Robin fought crime.,complex
+My brother and I went hiking.,complex
+The teacher and the student were discussing.,complex
+Paul and Peter play the guitar.,complex
+Alice and Bob solve puzzles.,complex
+The writer and the poet collaborated on a book.,complex
+Romeo and Juliet loved deeply.,complex
+The captain and the crew sailed the seas.,complex
+Harry and Ron faced many challenges.,complex
+The chef and his assistant prepared a feast.,complex
+Susan and I will watch a movie.,complex
+The lion and the tiger roared.,complex
+The sun and the moon are celestial bodies.,complex
+Linda and her friend dance gracefully.,complex
+Mom and dad are celebrating their anniversary.,complex
+Rachel and Monica share an apartment.,complex
+John and Mary are traveling.,complex
+Anna and Elsa share a bond.,complex
+Tom and Jerry chase each other.,complex
+Jack and Jill went up the hill.,complex
+The king and the queen ruled wisely.,complex
+Mike and his sister study together.,complex
+The one who will run kicks the ball.,nominalization
+The swimmer has reached the shore.,nominalization
+The driver is opening the door.,nominalization
+The painter finished the one who was sketching.,nominalization
+The one who cooks prepares the meal.,nominalization
+The one who will jump waits quietly.,nominalization
+The climber holds the rope tightly.,nominalization
+The sleeper woke up suddenly.,nominalization
+The one who will teach greets the students.,nominalization
+The dancer spins on the stage.,nominalization
+The one who laughs startled the child.,nominalization
+The walker approached the building.,nominalization
+The one who will speak interrupts the meeting.,nominalization
+The writer closes the notebook.,nominalization
+The one who is running enjoys the wind.,nominalization
+The builder constructs a house.,nominalization
+The reader has found the one who writes.,nominalization
+The one who will drive grabs the keys.,nominalization
+The singer leads the choir.,nominalization
+The listener frowns at the noise.,nominalization
+The one who paints watches the sunset.,nominalization
+The shopper picks the apples.,nominalization
+The one who will read turns the page.,nominalization
+The sleeper dreams peacefully.,nominalization
+The one who will jump stands at the edge.,nominalization

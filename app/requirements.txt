@@ -1,0 +1,7 @@
+Flask==2.0.1
+Werkzeug==2.2.2
+Flask-Limiter
+Flask-Talisman
+auth0-python
+Flask-OAuthlib
+Flask-WTF

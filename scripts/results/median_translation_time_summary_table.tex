@@ -1,0 +1,58 @@
+\begin{table}
+\caption{Summary of Median Translation Time by Sentence Type and Translator}
+\label{tab:median_translation_time_summary}
+\begin{tabular}{lllrrrrr}
+\toprule
+Translator & Model & Sentence Type & Median Translation Time & Q1 Translation Time & Q3 Translation Time & Error Y Plus & Error Y Minus \\
+\midrule
+Builder & gpt-4o & complex & 17.373 & 14.785 & 18.587 & 1.214 & 2.589 \\
+Builder & gpt-4o & nominalization & 22.431 & 20.318 & 24.057 & 1.625 & 2.113 \\
+Builder & gpt-4o & subject-verb & 6.251 & 5.729 & 7.660 & 1.410 & 0.521 \\
+Builder & gpt-4o & subject-verb-object & 17.634 & 16.126 & 19.895 & 2.261 & 1.508 \\
+Builder & gpt-4o & two-clause & 19.494 & 18.821 & 20.099 & 0.605 & 0.673 \\
+Builder & gpt-4o & two-verb & 19.468 & 18.776 & 32.406 & 12.938 & 0.692 \\
+Builder & gpt-4o-mini & complex & 6.662 & 6.472 & 8.840 & 2.178 & 0.189 \\
+Builder & gpt-4o-mini & nominalization & 8.675 & 7.882 & 17.392 & 8.717 & 0.793 \\
+Builder & gpt-4o-mini & subject-verb & 6.706 & 6.477 & 7.380 & 0.675 & 0.229 \\
+Builder & gpt-4o-mini & subject-verb-object & 8.413 & 7.948 & 9.396 & 0.983 & 0.465 \\
+Builder & gpt-4o-mini & two-clause & 13.496 & 12.388 & 15.420 & 1.925 & 1.108 \\
+Builder & gpt-4o-mini & two-verb & 12.365 & 6.607 & 13.692 & 1.327 & 5.758 \\
+Finetuned & gpt-4o & complex & 0.775 & 0.594 & 0.978 & 0.204 & 0.180 \\
+Finetuned & gpt-4o & nominalization & 0.602 & 0.556 & 0.890 & 0.288 & 0.046 \\
+Finetuned & gpt-4o & subject-verb & 0.636 & 0.417 & 0.903 & 0.267 & 0.219 \\
+Finetuned & gpt-4o & subject-verb-object & 0.592 & 0.507 & 0.874 & 0.282 & 0.085 \\
+Finetuned & gpt-4o & two-clause & 0.645 & 0.557 & 0.895 & 0.250 & 0.088 \\
+Finetuned & gpt-4o & two-verb & 0.611 & 0.506 & 0.913 & 0.302 & 0.105 \\
+Finetuned & gpt-4o-mini & complex & 0.451 & 0.416 & 0.484 & 0.034 & 0.035 \\
+Finetuned & gpt-4o-mini & nominalization & 0.469 & 0.436 & 0.504 & 0.035 & 0.033 \\
+Finetuned & gpt-4o-mini & subject-verb & 0.388 & 0.362 & 0.403 & 0.015 & 0.026 \\
+Finetuned & gpt-4o-mini & subject-verb-object & 0.423 & 0.367 & 0.459 & 0.037 & 0.056 \\
+Finetuned & gpt-4o-mini & two-clause & 0.418 & 0.392 & 0.474 & 0.057 & 0.026 \\
+Finetuned & gpt-4o-mini & two-verb & 0.404 & 0.380 & 0.431 & 0.027 & 0.024 \\
+Instructions-Based & gpt-4o & complex & 1.395 & 1.243 & 1.562 & 0.168 & 0.151 \\
+Instructions-Based & gpt-4o & nominalization & 1.175 & 1.127 & 1.366 & 0.191 & 0.048 \\
+Instructions-Based & gpt-4o & subject-verb & 1.044 & 1.012 & 1.065 & 0.021 & 0.032 \\
+Instructions-Based & gpt-4o & subject-verb-object & 1.117 & 1.092 & 1.162 & 0.045 & 0.025 \\
+Instructions-Based & gpt-4o & two-clause & 1.215 & 1.179 & 1.353 & 0.139 & 0.036 \\
+Instructions-Based & gpt-4o & two-verb & 1.157 & 1.119 & 1.309 & 0.152 & 0.038 \\
+Instructions-Based & gpt-4o-mini & complex & 0.965 & 0.658 & 1.271 & 0.306 & 0.307 \\
+Instructions-Based & gpt-4o-mini & nominalization & 0.656 & 0.606 & 0.865 & 0.209 & 0.050 \\
+Instructions-Based & gpt-4o-mini & subject-verb & 0.517 & 0.483 & 0.589 & 0.073 & 0.034 \\
+Instructions-Based & gpt-4o-mini & subject-verb-object & 0.628 & 0.581 & 0.655 & 0.027 & 0.046 \\
+Instructions-Based & gpt-4o-mini & two-clause & 0.652 & 0.611 & 0.716 & 0.064 & 0.042 \\
+Instructions-Based & gpt-4o-mini & two-verb & 0.585 & 0.541 & 0.636 & 0.051 & 0.045 \\
+Pipeline & gpt-4o & complex & 5.007 & 4.818 & 5.163 & 0.156 & 0.189 \\
+Pipeline & gpt-4o & nominalization & 3.058 & 2.732 & 3.262 & 0.204 & 0.326 \\
+Pipeline & gpt-4o & subject-verb & 2.813 & 2.740 & 3.002 & 0.189 & 0.073 \\
+Pipeline & gpt-4o & subject-verb-object & 3.076 & 2.856 & 3.208 & 0.132 & 0.221 \\
+Pipeline & gpt-4o & two-clause & 4.917 & 4.674 & 5.164 & 0.247 & 0.244 \\
+Pipeline & gpt-4o & two-verb & 4.878 & 4.771 & 5.152 & 0.274 & 0.107 \\
+Pipeline & gpt-4o-mini & complex & 3.350 & 3.175 & 3.471 & 0.121 & 0.174 \\
+Pipeline & gpt-4o-mini & nominalization & 2.173 & 2.111 & 2.461 & 0.288 & 0.062 \\
+Pipeline & gpt-4o-mini & subject-verb & 1.806 & 1.767 & 2.023 & 0.217 & 0.038 \\
+Pipeline & gpt-4o-mini & subject-verb-object & 1.892 & 1.832 & 1.925 & 0.033 & 0.060 \\
+Pipeline & gpt-4o-mini & two-clause & 3.302 & 3.161 & 3.437 & 0.135 & 0.141 \\
+Pipeline & gpt-4o-mini & two-verb & 3.193 & 3.104 & 3.328 & 0.136 & 0.089 \\
+\bottomrule
+\end{tabular}
+\end{table}

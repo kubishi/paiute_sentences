@@ -1,27 +1,17 @@
-A Web App to create simple sentences in paiute.
+# Yaduha
+An LLM-RBMT tool for translating between English and Owens Valley Paiute (OVP).
 
-# TODOs
-- [ ] Package the app
-
-# Usage
-First, install the dependencies:
-```bash
-pip install -r requirements.txt
+## Installation
+1. Clone the repository
+```bash	
+git clone git@github.com:kubishi/kubishi_sentences
 ```
-
-For OVP to English Translation:
+2. Install the package
 ```bash
-python translate_ovp2eng.py --help
+pip install ./src
 ```
-
-For English to OVP Translation:
+3. Run the examples in the [scripts](./scripts) directory
 ```bash
-python translate_eng2ovp.py --help
+cd ./scripts
+python example_pipeline.py
 ```
-All results (if any) for running the above commands will be saved in the ```.results``` directory.
-
-To plot the results from running ```python translate_eng2ovp.py evaluate```, run:
-```bash
-python plot_results.py
-```
-The results will be saved in the ```.output``` directory.
